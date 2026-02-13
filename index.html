@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stellar · advanced portfolio</title>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ---------- GLOBAL RESET / VARIABLES ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-dark: #0a0f1e;
+      --bg-deep: #0b0e14;
+      --surface: #151b28;
+      --surface-light: #1e2636;
+      --accent-neon: #4e9eea;
+      --accent-glow: rgba(78, 158, 234, 0.5);
+      --accent-secondary: #c084fc;
+      --text-primary: #f0f4ff;
+      --text-secondary: #b3c7e5;
+      --text-muted: #7c8ba0;
+      --grad-1: linear-gradient(145deg, #1c2537, #131a28);
+      --grad-card: linear-gradient(145deg, #1c2537, #141c2b);
+      --shadow-1: 0 20px 35px -10px rgba(0, 0, 0, 0.6);
+      --border-glow: 1px solid rgba(78, 158, 234, 0.2);
+      --border-glow-hover: 1px solid rgba(78, 158, 234, 0.5);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* DYNAMIC GRADIENT BACKGROUND — ADVANCED */
+    .noise-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 30% 40%, rgba(25, 40, 75, 0.75) 0%, transparent 35%),
+                  radial-gradient(circle at 80% 70%, rgba(20, 30, 60, 0.8) 0%, transparent 40%),
+                  radial-gradient(circle at 10% 80%, rgba(45, 60, 120, 0.6) 0%, transparent 45%),
+                  #0a0f1e;
+      z-index: -2;
+    }
+
+    canvas#gradient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* ---------- TYPOGRAPHY & LAYOUT ---------- */
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      position: relative;
+      z-index: 5;
+    }
+
+    section {
+      margin-bottom: 7rem;
+    }
+
+    h1, h2, h3 {
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      font-size: 4.2rem;
+      font-weight: 800;
+      line-height: 1.1;
+      background: linear-gradient(to right, #ffffff, #c7e0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: 2.8rem;
+      margin-bottom: 2.5rem;
+      display: inline-block;
+      position: relative;
+    }
+    h2:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 70px;
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent-neon), var(--accent-secondary));
+      border-radius: 3px;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    /* ---------- GLASS PANEL / CARD BASE ---------- */
+    .glass-card {
+      background: rgba(21, 27, 40, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: var(--border-glow);
+      border-radius: 40px;
+      box-shadow: 0 25px 40px -15px rgba(0,0,0,0.5);
+      transition: transform 0.25s ease, border 0.2s, box-shadow 0.3s;
+    }
+
+    .glass-card:hover {
+      border: var(--border-glow-hover);
+      box-shadow: 0 30px 50px -15px rgba(78,158,234,0.3);
+    }
+
+    /* ---------- HEADER / NAV ---------- */
+    nav {
+      display: flex;
+      justify-content: flex-end;
+      gap: 3rem;
+      padding: 1.5rem 2rem;
+      background: rgba(10, 15, 30, 0.5);
+      backdrop-filter: blur(15px);
+      border-radius: 70px;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 2rem;
+    }
+
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: 0.2s;
+      letter-spacing: 0.5px;
+      position: relative;
+    }
+    nav a i {
+      margin-right: 6px;
+    }
+    nav a:hover {
+      color: white;
+      text-shadow: 0 0 8px var(--accent-neon);
+    }
+    nav a.active {
+      color: var(--accent-neon);
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .hero-left {
+      flex: 1 1 350px;
+    }
+
+    .hero-right {
+      flex: 0 1 300px;
+      position: relative;
+    }
+
+    .avatar-box {
+      width: 280px;
+      height: 280px;
+      background: var(--grad-card);
+      border-radius: 50% 40% 60% 40% / 40% 50% 50% 60%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(78, 158, 234, 0.4);
+      box-shadow: 0 30px 40px -15px black;
+      animation: float 8s infinite alternate ease-in-out;
+    }
+    .avatar-box i {
+      font-size: 9rem;
+      color: rgba(200, 225, 255, 0.9);
+      text-shadow: 0 0 30px var(--accent-neon);
+    }
+
+    .badge {
+      background: rgba(78,158,234,0.15);
+      border: 1px solid var(--accent-neon);
+      border-radius: 50px;
+      padding: 0.5rem 1.5rem;
+      display: inline-block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(5px);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: white;
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ---------- 3D TILT CARDS (PROJECTS) ---------- */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .project-card {
+      background: var(--grad-card);
+      border-radius: 30px;
+      padding: 2rem 1.8rem;
+      border: 1px solid rgba(78,158,234,0.15);
+      transition: all 0.2s;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: perspective(800px) rotateX(0deg) rotateY(0deg);
+      box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5);
+    }
+
+    .project-icon {
+      font-size: 2.8rem;
+      color: var(--accent-neon);
+      margin-bottom: 1.2rem;
+      text-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .project-card h3 {
+      font-size: 1.8rem;
+      margin-bottom: 0.7rem;
+      color: white;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1.2rem 0;
+    }
+    .tag {
+      background: rgba(78,158,234,0.08);
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-secondary);
+    }
+
+    .project-link {
+      text-decoration: none;
+      color: var(--accent-neon);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      transition: 0.2s;
+    }
+    .project-link i {
+      transition: transform 0.2s;
+    }
+    .project-link:hover i {
+      transform: translateX(6px);
+    }
+
+    /* ---------- SKILLS : 3D GLOBE / BUBBLES ---------- */
+    .skills-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      justify-content: center;
+      margin-top: 2.5rem;
+      perspective: 600px;
+    }
+
+    .skill-bubble {
+      background: rgba(21, 27, 40, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(78, 158, 234, 0.3);
+      padding: 0.8rem 2rem;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #e3f0ff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 20px -5px rgba(0,0,0,0.4);
+      transition: 0.15s;
+      transform: rotateX(2deg) rotateY(2deg);
+    }
+    .skill-bubble i {
+      color: var(--accent-neon);
+      font-size: 1.2rem;
+    }
+    .skill-bubble:hover {
+      background: var(--accent-neon);
+      color: #0a0f1e;
+      border-color: white;
+      transform: scale(1.07) rotateX(0deg);
+    }
+    .skill-bubble:hover i {
+      color: black;
+    }
+
+    /* ---------- TIMELINE (EXPERIENCE) ---------- */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .timeline-item {
+      display: flex;
+      gap: 1.8rem;
+      background: rgba(21,27,40,0.5);
+      backdrop-filter: blur(8px);
+      padding: 1.8rem 2.2rem;
+      border-radius: 40px;
+      border: var(--border-glow);
+      transition: 0.25s;
+    }
+    .timeline-item:hover {
+      border-color: var(--accent-neon);
+      background: rgba(30, 40, 60, 0.7);
+    }
+    .timeline-icon {
+      font-size: 2rem;
+      color: var(--accent-neon);
+    }
+    .timeline-content h4 {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .timeline-date {
+      color: var(--accent-secondary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ---------- CONTACT / FOOTER ---------- */
+    .contact-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: radial-gradient(circle at 50% 0%, rgba(78,158,234,0.1), transparent 70%);
+      border-radius: 100px 100px 40px 40px;
+    }
+    .contact-links {
+      display: flex;
+      gap: 2.5rem;
+      margin: 2.5rem 0;
+      font-size: 2.2rem;
+    }
+    .contact-links a {
+      color: var(--text-secondary);
+      transition: 0.2s;
+    }
+    .contact-links a:hover {
+      color: var(--accent-neon);
+      transform: translateY(-8px);
+      text-shadow: 0 0 25px var(--accent-neon);
+    }
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes float {
+      0% { border-radius: 50% 40% 60% 40% / 40% 50% 50% 60%; transform: translateY(0px); }
+      100% { border-radius: 40% 60% 40% 60% / 60% 40% 60% 40%; transform: translateY(-15px); }
+    }
+
+    /* responsive */
+    @media (max-width: 800px) {
+      h1 { font-size: 3rem; }
+      nav { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Advanced moving gradient canvas (JS animated) -->
+  <canvas id="gradient-canvas"></canvas>
+  <div class="noise-bg"></div>
+
+  <div class="container">
+    <!-- Navigation -->
+    <nav>
+      <a href="#" class="active"><i class="fas fa-home"></i> Home</a>
+      <a href="#projects"><i class="fas fa-code-branch"></i> Work</a>
+      <a href="#skills"><i class="fas fa-cube"></i> Skills</a>
+      <a href="#experience"><i class="fas fa-briefcase"></i> Exp</a>
+      <a href="#contact"><i class="fas fa-paper-plane"></i> Contact</a>
+    </nav>
+
+    <!-- HERO section with advanced tilt (3D personal effect) -->
+    <section id="home">
+      <div class="hero">
+        <div class="hero-left">
+          <span class="badge"><i class="fas fa-bolt" style="margin-right: 6px;"></i> Next‑gen developer</span>
+          <h1>Turning ideas into<br>interactive realities</h1>
+          <p style="font-size: 1.3rem; color: var(--text-secondary); margin-bottom: 2rem; max-width: 550px;">
+            Hi, I'm <strong style="color:white;">Alex Mercer</strong> — creative full‑stack engineer & 3D design enthusiast.
+          </p>
+          <div class="hero-stats">
+            <div class="stat-item"><span class="stat-number">7+</span><span class="stat-label">Years craft</span></div>
+            <div class="stat-item"><span class="stat-number">48</span><span class="stat-label">Projects</span></div>
+            <div class="stat-item"><span class="stat-number">24</span><span class="stat-label">Clients</span></div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="avatar-box">
+            <i class="fas fa-robot"></i> 
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS section – 3D tilt with JS -->
+    <section id="projects">
+      <h2>Featured creations</h2>
+      <div class="projects-grid" id="projectContainer">
+        <!-- cards will have data-tilt attributes, JS used for 3D rotate -->
+        <div class="project-card" data-tilt data-tilt-max="8" data-tilt-glare="true" data-tilt-scale="1.02">
+          <div class="project-icon"><i class="fas fa-brain"></i></div>
+          <h3>Neural UI</h3>
+          <p style="color: var(--text-secondary);">Adaptive interface with real‑time ML predictions. Used by 3k+ designers.</p>
+          <div class="project-tags">
+            <span class="tag">TensorFlow</span>
+            <span class="tag">Vue 3</span>
+            <span class="tag">Three.js</span>
+          </div>
+          <a href="#" class="project-link">Explore <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="project-card" data-tilt data-tilt-max="10" data-tilt-glare="true">
+          <div class="project-icon"><i class="fas fa-cubes"></i></div>
+          <h3>MetaSpace</h3>
+          <p style="color: var(--text-secondary);">Immersive 3D configurator for virtual showrooms. WebGL based.</p>
+          <div class="project-tags">
+            <span class="tag">React</span>
+            <span class="tag">WebGL</span>
+            <span class="tag">Blender</span>
+          </div>
+          <a href="#" class="project-link">Live demo <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="project-card" data-tilt data-tilt-max="12" data-tilt-glare="true">
+          <div class="project-icon"><i class="fas fa-chart-line"></i></div>
+          <h3>EcoChain</h3>
+          <p style="color: var(--text-secondary);">Blockchain carbon tracker — transparent, auditable, beautiful.</p>
+          <div class="project-tags">
+            <span class="tag">Solidity</span>
+            <span class="tag">D3.js</span>
+            <span class="tag">Next.js</span>
+          </div>
+          <a href="#" class="project-link">Case study <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS section - interactive floating cloud (JS mapped) -->
+    <section id="skills">
+      <h2>Toolbox & expertise</h2>
+      <div class="skills-cloud" id="skillCloud">
+        <!-- icons & names via JS injection, but fallback here also -->
+      </div>
+      <p style="text-align: center; color: var(--text-muted); margin-top: 1.5rem;"><i class="fas fa-magic" style="color: var(--accent-neon);"></i> hover to feel the depth — each bubble reacts</p>
+    </section>
+
+    <!-- EXPERIENCE timeline -->
+    <section id="experience">
+      <h2>Path & milestones</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-crown"></i></div>
+          <div class="timeline-content">
+            <h4>Lead creative technologist</h4>
+            <div class="timeline-date">2022 — present · Aurora Labs</div>
+            <p style="color: var(--text-secondary);">Architected immersive web platforms, led team of 6, shipped 15+ enterprise metaverse solutions.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-layer-group"></i></div>
+          <div class="timeline-content">
+            <h4>3D frontend engineer</h4>
+            <div class="timeline-date">2019 — 2022 · Studio Brume</div>
+            <p style="color: var(--text-secondary);">Built WebGL interactive installations for global fashion brands.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-graduation-cap"></i></div>
+          <div class="timeline-content">
+            <h4>Interactive media M.Sc.</h4>
+            <div class="timeline-date">2017 — 2019 · Royal College of Art</div>
+            <p style="color: var(--text-secondary);">Research on haptic feedback and generative design.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT footer area -->
+    <section id="contact">
+      <div class="contact-area glass-card">
+        <h2 style="all: unset; font-size: 2.8rem; font-weight: 800; background: linear-gradient(to right, #fff, #b3e0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">Let’s connect</h2>
+        <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 500px;">Ready to push boundaries? I’m one message away.</p>
+        <div class="contact-links">
+          <a href="#"><i class="fab fa-github"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-x-twitter"></i></a>
+          <a href="#"><i class="fab fa-dribbble"></i></a>
+          <a href="#"><i class="fas fa-envelope"></i></a>
+        </div>
+        <p style="color: var(--text-muted;">© 2025 Alex Mercer · advanced portfolio</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========== ADVANCED JAVASCRIPT : 3D tilt, gradient, skill inject, mouse effect ========== -->
+  <script>
+    (function() {
+      "use strict";
+
+      // ---------- 1. DYNAMIC GRADIENT CANVAS (moving metaballs) ----------
+      const canvas = document.getElementById('gradient-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      
+      let gradientPoints = [
+        { x: 0.3, y: 0.2, vx: 0.0007, vy: 0.0005, color: 'rgba(30, 110, 210, 0.25)' },
+        { x: 0.7, y: 0.5, vx: -0.0005, vy: 0.0009, color: 'rgba(160, 100, 230, 0.22)' },
+        { x: 0.5, y: 0.8, vx: 0.0008, vy: -0.0004, color: 'rgba(20, 180, 200, 0.2)' },
+        { x: 0.2, y: 0.6, vx: 0.0004, vy: -0.0007, color: 'rgba(70, 130, 250, 0.25)' },
+        { x: 0.8, y: 0.3, vx: -0.0006, vy: 0.0003, color: 'rgba(110, 80, 240, 0.2)' }
+      ];
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      function drawGradient() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        
+        // move points slowly
+        for (let p of gradientPoints) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x > 1 || p.x < 0) p.vx *= -1;
+          if (p.y > 1 || p.y < 0) p.vy *= -1;
+          p.x = Math.min(0.98, Math.max(0.02, p.x));
+          p.y = Math.min(0.98, Math.max(0.02, p.y));
+        }
+
+        // draw radial gradients blending
+        for (let i = 0; i < gradientPoints.length; i++) {
+          const p = gradientPoints[i];
+          const x = p.x * width;
+          const y = p.y * height;
+          const radius = Math.min(width, height) * 0.4;
+          
+          const gradient = ctx.createRadialGradient(x, y, radius * 0.1, x, y, radius);
+          gradient.addColorStop(0, p.color);
+          gradient.addColorStop(0.9, 'rgba(10, 15, 30, 0)');
+          
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, width, height);
+        }
+        requestAnimationFrame(drawGradient);
+      }
+      drawGradient();
+
+      // ---------- 2. 3D TILT on project cards (vanilla tilt like) ----------
+      function initTiltEffects() {
+        const cards = document.querySelectorAll('.project-card');
+        cards.forEach(card => {
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const deltaX = (x - centerX) / centerX; // -1 to 1
+            const deltaY = (y - centerY) / centerY; // -1 to 1
+            
+            const tiltX = deltaY * -8;  // rotate around X
+            const tiltY = deltaX * 10;   // rotate around Y
+            
+            card.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+            card.style.borderImage = `linear-gradient(145deg, rgba(78,158,234,0.5), rgba(192,132,252,0.5))`;
+            card.style.boxShadow = `0 25px 40px -15px rgba(78,158,234,0.4)`;
+          });
+          
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = `perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
+            card.style.boxShadow = `0 20px 35px -10px rgba(0,0,0,0.5)`;
+            card.style.borderImage = `none`;
+          });
+        });
+      }
+
+      // ---------- 3. SKILL CLOUD : dynamic & awesome (inserted via js) ----------
+      function renderSkillCloud() {
+        const cloud = document.getElementById('skillCloud');
+        if (!cloud) return;
+        const skills = [
+          { name: 'React', icon: 'fab fa-react' },
+          { name: 'Three.js', icon: 'fas fa-cube' },
+          { name: 'Node.js', icon: 'fab fa-node' },
+          { name: 'TypeScript', icon: 'fas fa-code' },
+          { name: 'WebGL', icon: 'fas fa-globe' },
+          { name: 'Python', icon: 'fab fa-python' },
+          { name: 'Figma', icon: 'fab fa-figma' },
+          { name: 'TensorFlow', icon: 'fas fa-brain' },
+          { name: 'MongoDB', icon: 'fas fa-database' },
+          { name: 'Tailwind', icon: 'fas fa-wind' },
+          { name: 'Docker', icon: 'fab fa-docker' },
+          { name: 'GSAP', icon: 'fas fa-play' }
+        ];
+        let html = '';
+        skills.forEach(skill => {
+          html += `<div class="skill-bubble"><i class="${skill.icon}"></i> ${skill.name}</div>`;
+        });
+        cloud.innerHTML = html;
+        
+        // add random slight tilt on each bubble for 3D feel
+        const bubbles = document.querySelectorAll('.skill-bubble');
+        bubbles.forEach(b => {
+          const xRot = (Math.random() * 6 - 3).toFixed(1);
+          const yRot = (Math.random() * 6 - 3).toFixed(1);
+          b.style.transform = `rotateX(${xRot}deg) rotateY(${yRot}deg)`;
+        });
+      }
+
+      // ---------- 4. MOUSE PARALLAX for hero avatar ----------
+      function initMouseParallax() {
+        const avatar = document.querySelector('.avatar-box');
+        if (!avatar) return;
+        document.addEventListener('mousemove', (e) => {
+          const x = (e.clientX / window.innerWidth - 0.5) * 20;
+          const y = (e.clientY / window.innerHeight - 0.5) * 20;
+          avatar.style.transform = `translateX(${x}px) translateY(${y}px) rotate(calc(${x} * 0.5deg))`;
+        });
+      }
+
+      // ---------- 5. active nav highlight ----------
+      function setActiveNav() {
+        const navLinks = document.querySelectorAll('nav a');
+        const sections = document.querySelectorAll('section');
+        window.addEventListener('scroll', () => {
+          let current = '';
+          sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            const sectionHeight = section.offsetHeight;
+            if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+              current = section.getAttribute('id');
+            }
+          });
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href').replace('#', '');
+            if (href === current) link.classList.add('active');
+            if (!current && link.getAttribute('href') === '#') link.classList.add('active');
+          });
+        });
+      }
+
+      // init everything
+      window.addEventListener('load', function() {
+        renderSkillCloud();
+        initTiltEffects();
+        initMouseParallax();
+        setActiveNav();
+      });
+
+      // tilt also for dynamically added? but fine.
+      // refresh tilt on project cards if any change, not needed.
+      // extra: subtle glare effect with pseudo element? keep it clean.
+    })();
+  </script>
+
+  <!-- small additional tweaks: glare feel (via border) already included -->
+  <style>
+    /* extra micro-interactions */
+    .project-card {
+      transition: transform 0.1s, box-shadow 0.2s, border 0.1s;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+    .skill-bubble {
+      transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), background 0.15s, box-shadow 0.2s;
+    }
+    .skill-bubble:hover {
+      box-shadow: 0 0 25px var(--accent-glow);
+    }
+    nav a.active:after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent-neon);
+      box-shadow: 0 0 12px var(--accent-neon);
+    }
+  </style>
+</body>
+</html>
